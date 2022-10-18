@@ -63,6 +63,7 @@ class Game extends React.Component {
       }],
       XisNext: true,
       stepNumber: 0,
+      sortOrder: true,
     }
   }
   handleClick(i) {
@@ -93,9 +94,8 @@ class Game extends React.Component {
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares)[0];
     const hilighteds = calculateWinner(current.squares)[1];
-    console.log(hilighteds);
 
-    const moves = history.map((step, move) => {
+    let moves = history.map((step, move) => {
       const desc = move ?
         'Go to move #' + move :
         'Go to game start';
@@ -112,6 +112,9 @@ class Game extends React.Component {
         </li>
       );
     });
+    if (!this.state.sortOrder) {
+      moves = moves.slice(0).reverse();
+    }
 
     let status;
     if (this.state.stepNumber === 9 && !winner) {
@@ -132,6 +135,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <button onClick={() => this.setState({ sortOrder: !this.state.sortOrder })}>reverse order</button>
           <ol>{moves}</ol>
         </div>
       </div>
