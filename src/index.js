@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 
 function Square(props) {
+  const value = (props.hilighted) ? <mark>{props.value}</mark> : props.value;
   return (
     <button className="square" onClick={props.onClick}>
-      {props.value}
+      {value}
     </button>
   );
 }
@@ -13,6 +14,7 @@ function Square(props) {
 class Board extends React.Component {
   renderSquare(i) {
     return <Square
+      hilighted={this.props.hilighteds.includes(i)}
       key={i}
       value={this.props.squares[i]}
       onClick={() => { this.props.onClick(i); }}
@@ -67,7 +69,7 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares)[0] || squares[i]) {
       return;
     }
     squares[i] = this.state.XisNext ? 'X' : 'O';
@@ -89,7 +91,9 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
+    const winner = calculateWinner(current.squares)[0];
+    const hilighteds = calculateWinner(current.squares)[1];
+    console.log(hilighteds);
 
     const moves = history.map((step, move) => {
       const desc = move ?
@@ -121,6 +125,7 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <Board
+            hilighteds={hilighteds}
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
           />
@@ -153,8 +158,8 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return [squares[a], lines[i]];
     }
   }
-  return null;
+  return [null, []];
 }
